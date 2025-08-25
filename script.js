@@ -1,6 +1,8 @@
-// -----------------------------
-// Набор городов для автокомплита
-// -----------------------------
+// ============================
+// Минималистичная логика формы
+// ============================
+
+// Список городов для автокомплита (обрезан до популярных, можно расширить)
 const RUSSIAN_CITIES = [
   'Москва','Санкт-Петербург','Новосибирск','Екатеринбург','Казань','Нижний Новгород',
   'Челябинск','Самара','Омск','Ростов-на-Дону','Уфа','Красноярск','Воронеж','Пермь',
@@ -15,83 +17,79 @@ const RUSSIAN_CITIES = [
   'Шахты','Нижнекамск','Орск','Ангарск','Балашиха','Благовещенск','Прокопьевск','Химки',
   'Псков','Бийск','Энгельс','Рыбинск','Балаково','Северодвинск','Армавир','Подольск',
   'Королёв','Сызрань','Норильск','Золотое Кольцо','Петропавловск-Камчатский','Камышин',
-  'Новочеркасск','Березники','Кисловодск','Ессентуки','Пятигорск','Железнодорожный',
-  'Абакан','Невинномысск','Димитровград','Батайск','Камень-на-Оби','Новотроицк','Ноябрьск',
-  'Каменск-Уральский'
+  'Новочеркасск','Березники','Кисловодск','Ессентуки','Пятигорск','Абакан','Невинномысск',
+  'Димитровград','Батайск','Новотроицк','Ноябрьск','Каменск-Уральский'
 ];
 
-// -----------------------------
-// Утилиты
-// -----------------------------
-const $ = (sel, root = document) => root.querySelector(sel);
-const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-const setHidden = (el, hidden) => { if (!el) return; el.hidden = !!hidden; };
+const state = {
+  data: {
+    applicantType: '',
+    fullName: '',
+    phone: '',
+    email: '',
+    cargoType: '',
+    cargoWeight: '',
+    departureDate: '',
+    fromAddress: '',
+    toAddress: '',
+    cargoDescription: '',
+    vehicleType: '',
+    maxWeight: '',
+    availableRoutes: '',
+    pricePerKm: ''
+  },
+  touched: {},
+  isSubmitting: false
+};
 
 // Маска телефона: +7 (___) ___-__-__
 function phoneMask(value) {
-  const digits = value.replace(/\D/g, '');
+  const digits = value.replace(/\D/g,'');
+  let norm = digits.replace(/^8/, '').replace(/^7/, '');
   let out = '+7 (';
   let i = 0;
-
-  // если пользователь начинает с 8 или 7 — нормализуем
-  const norm = digits.replace(/^8/, '').replace(/^7/, '');
-
   for (const c of norm) {
     if (i === 3) out += ') ';
     else if (i === 6 || i === 8) out += '-';
-    out += c;
-    i++;
-    if (i >= 10) break;
+    out += c; i++; if (i >= 10) break;
   }
   return out;
 }
 
-// Плавная прокрутка к первому ошибочному полю
-function scrollToFirstError() {
-  const firstError = $('.input.error, .select.error, .textarea.error');
-  if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-// Сегодняшняя дата для min атрибута
+// Сегодняшняя дата в ISO (для min)
 function todayIso() {
-  const d = new Date();
-  d.setHours(0,0,0,0);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const d = new Date(); d.setHours(0,0,0,0);
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
   const dd = String(d.getDate()).padStart(2,'0');
-  return `${yyyy}-${mm}-${dd}`;
+  return `${y}-${m}-${dd}`;
 }
 
-// -----------------------------
 // Валидация
-// -----------------------------
-function getRules(applicantType) {
+function rules(applicantType) {
   const base = {
     applicantType: v => !v ? 'Выберите тип заявки' : null,
-    fullName: v => {
-      if (!v?.trim()) return 'Поле «Имя» обязательно';
-      if (v.trim().length < 2) return 'Имя должно быть не короче 2 символов';
-      return null;
-    },
+    fullName: v => !v?.trim() ? 'Поле «Имя» обязательно' : (v.trim().length < 2 ? 'Имя слишком короткое' : null),
     phone: v => {
       if (!v?.trim()) return 'Поле «Телефон» обязательно';
-      const digits = v.replace(/\D/g, '');
-      if (!digits.startsWith('7') && !digits.startsWith('8')) return 'Номер должен начинаться с 7 или 8';
-      if (digits.replace(/^8/, '').replace(/^7/, '').length !== 10) return 'Введите 10 цифр после кода страны';
+      const digits = v.replace(/\D/g,'');
+      if (!digits.startsWith('7') && !digits.startsWith('8')) return 'Начните с 7 или 8';
+      if (digits.replace(/^8/,'').replace(/^7/,'').length !== 10) return 'Введите 10 цифр после кода';
       return null;
     },
     email: v => {
       if (!v) return null;
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(v) ? null : 'Неверный формат email';
+      return re.test(v) ? null : 'Неверный email';
     }
   };
 
   const onlyRu = v => {
     if (!v?.trim()) return 'Заполните поле';
-    const re = /^[а-яёА-ЯЁ\-\.\s]+$/;
-    return re.test(v) ? null : 'Только русские буквы и дефис';
+    return /^[а-яёА-ЯЁ\-\.\s]+$/.test(v) ? null : 'Только русские буквы и дефис';
   };
 
   if (applicantType === 'shipper') {
@@ -122,171 +120,69 @@ function getRules(applicantType) {
   return base;
 }
 
-function setFieldError(id, error) {
+function setFieldError(id, msg) {
   const input = document.getElementById(id);
   const err = document.getElementById(`${id}-error`);
   if (!input || !err) return;
-
-  if (error) {
-    input.classList.add('error');
-    err.textContent = error;
+  if (msg) {
+    input.classList.add('error'); err.textContent = msg;
   } else {
-    input.classList.remove('error');
-    err.textContent = '';
+    input.classList.remove('error'); err.textContent = '';
   }
-}
-
-// -----------------------------
-// Автокомплит
-// -----------------------------
-function initAutocomplete(inputId) {
-  const input = document.getElementById(inputId);
-  const dropdown = document.getElementById(`${inputId}-dropdown`);
-  if (!input || !dropdown) return;
-
-  let items = [];
-  let index = -1;
-
-  function close() {
-    dropdown.classList.remove('show');
-    dropdown.innerHTML = '';
-    index = -1;
-  }
-
-  function render(list) {
-    dropdown.innerHTML = '';
-    list.forEach((city, i) => {
-      const el = document.createElement('div');
-      el.className = 'autocomplete-item';
-      el.setAttribute('role', 'option');
-      el.innerHTML = `<span aria-hidden="true">📍</span><span>${city}</span>`;
-      el.addEventListener('mousedown', e => {
-        e.preventDefault();
-        input.value = city;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        close();
-      });
-      dropdown.appendChild(el);
-    });
-    if (list.length) dropdown.classList.add('show'); else close();
-  }
-
-  input.addEventListener('input', e => {
-    const v = e.target.value.trim().toLowerCase();
-    if (v.length < 2) { close(); return; }
-    items = RUSSIAN_CITIES.filter(c => c.toLowerCase().includes(v)).slice(0, 10);
-    render(items);
-  });
-
-  input.addEventListener('keydown', e => {
-    const options = Array.from(dropdown.children);
-    if (!options.length) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      index = Math.min(index + 1, options.length - 1);
-      options.forEach((o, i) => o.classList.toggle('selected', i === index));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      index = Math.max(index - 1, 0);
-      options.forEach((o, i) => o.classList.toggle('selected', i === index));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (index >= 0) {
-        input.value = items[index];
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        close();
-      }
-    } else if (e.key === 'Escape') {
-      close();
-    }
-  });
-
-  input.addEventListener('blur', () => setTimeout(close, 150));
-}
-
-// -----------------------------
-// Основная логика формы
-// -----------------------------
-const state = {
-  data: {
-    applicantType: '',
-    fullName: '',
-    phone: '',
-    email: '',
-    cargoType: '',
-    cargoWeight: '',
-    departureDate: '',
-    fromAddress: '',
-    toAddress: '',
-    cargoDescription: '',
-    vehicleType: '',
-    maxWeight: '',
-    availableRoutes: '',
-    pricePerKm: ''
-  },
-  touched: {},
-  isSubmitting: false
-};
-
-function applyTypeVisibility(type) {
-  const contact = document.getElementById('contactSection');
-  const shipper = document.getElementById('shipperSection');
-  const carrier = document.getElementById('carrierSection');
-  const actions = document.getElementById('formActions');
-  const submitText = document.getElementById('submitText');
-
-  const show = !!type;
-  setHidden(contact, !show);
-  setHidden(actions, !show);
-
-  if (type === 'shipper') {
-    setHidden(shipper, false); setHidden(carrier, true);
-    submitText.textContent = 'Найти транспорт';
-  } else if (type === 'carrier') {
-    setHidden(shipper, true); setHidden(carrier, false);
-    submitText.textContent = 'Предложить услугу';
-  } else {
-    setHidden(shipper, true); setHidden(carrier, true);
-  }
-}
-
-function collectForm() {
-  const fields = [
-    'applicantType','fullName','phone','email','cargoType','cargoWeight','departureDate',
-    'fromAddress','toAddress','cargoDescription','vehicleType','maxWeight','availableRoutes','pricePerKm'
-  ];
-  fields.forEach(id => {
-    const input = document.getElementById(id) || document.querySelector(`[name="${id}"]:checked`);
-    if (!input) return;
-    if (id === 'applicantType') state.data[id] = (document.querySelector('input[name="applicantType"]:checked')?.value) || '';
-    else state.data[id] = input.value;
-  });
 }
 
 function validateAll() {
-  const rules = getRules(state.data.applicantType);
-  const ids = Object.keys(rules);
-  let hasErrors = false;
-
-  ids.forEach(id => {
-    const value = id === 'applicantType'
+  const r = rules(state.data.applicantType);
+  let has = false;
+  Object.keys(r).forEach(id => {
+    const val = id === 'applicantType'
       ? (document.querySelector('input[name="applicantType"]:checked')?.value || '')
       : (document.getElementById(id)?.value ?? '');
-    const err = rules[id](value);
-    setFieldError(id, err);
-    if (err) hasErrors = true;
+    const msg = r[id](val);
+    setFieldError(id, msg);
+    if (msg) has = true;
   });
-
-  document.getElementById('errorAlert').hidden = !hasErrors;
-  if (hasErrors) scrollToFirstError();
-  return !hasErrors;
+  $('#errorAlert').hidden = !has;
+  if (has) {
+    const first = $('.input.error, .select.error, .textarea.error');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return !has;
 }
 
 function clearErrors() {
   $$('.input, .select, .textarea').forEach(el => el.classList.remove('error'));
   $$('.error').forEach(el => { if (el.id !== 'errorAlert') el.textContent = ''; });
   $('#errorAlert').hidden = true;
+}
+
+function applyTypeVisibility(type) {
+  const show = !!type;
+  $('#contactSection').hidden = !show;
+  $('#formActions').hidden = !show;
+
+  if (type === 'shipper') {
+    $('#shipperSection').hidden = false; $('#carrierSection').hidden = true;
+    $('#submitText').textContent = 'Найти транспорт';
+  } else if (type === 'carrier') {
+    $('#shipperSection').hidden = true; $('#carrierSection').hidden = false;
+    $('#submitText').textContent = 'Предложить услугу';
+  } else {
+    $('#shipperSection').hidden = true; $('#carrierSection').hidden = true;
+  }
+}
+
+function collectForm() {
+  const ids = ['applicantType','fullName','phone','email','cargoType','cargoWeight','departureDate',
+    'fromAddress','toAddress','cargoDescription','vehicleType','maxWeight','availableRoutes','pricePerKm'];
+  ids.forEach(id => {
+    if (id === 'applicantType') {
+      state.data[id] = (document.querySelector('input[name="applicantType"]:checked')?.value) || '';
+    } else {
+      const el = document.getElementById(id);
+      if (el) state.data[id] = el.value;
+    }
+  });
 }
 
 function resetForm() {
@@ -310,43 +206,91 @@ function resetForm() {
   $('#cargoForm').reset();
   applyTypeVisibility('');
   clearErrors();
-
-  // Видимость карточек
-  setHidden($('#successMessage'), true);
-  setHidden($('#applicationForm'), false);
+  $('#successMessage').hidden = true;
+  $('#applicationForm').hidden = false;
 }
 
-// -----------------------------
-// Инициализация
-// -----------------------------
-document.addEventListener('DOMContentLoaded', () => {
-  // Тема
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
-  else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-    document.documentElement.setAttribute('data-theme', 'light');
+// Автокомплит
+function initAutocomplete(inputId) {
+  const input = document.getElementById(inputId);
+  const dropdown = document.getElementById(`${inputId}-dropdown`);
+  if (!input || !dropdown) return;
+
+  let items = [];
+  let index = -1;
+
+  function close() {
+    dropdown.classList.remove('show');
+    dropdown.innerHTML = '';
+    index = -1;
   }
 
-  $('#themeToggle').addEventListener('click', () => {
-    const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', cur);
-    localStorage.setItem('theme', cur);
+  function render(list) {
+    dropdown.innerHTML = '';
+    list.forEach((city, i) => {
+      const el = document.createElement('div');
+      el.className = 'ac-item';
+      el.setAttribute('role', 'option');
+      el.innerHTML = `<span>📍</span><span>${city}</span>`;
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = city;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        close();
+      });
+      dropdown.appendChild(el);
+    });
+    if (list.length) dropdown.classList.add('show'); else close();
+  }
+
+  input.addEventListener('input', e => {
+    const v = e.target.value.trim().toLowerCase();
+    if (v.length < 2) { close(); return; }
+    items = RUSSIAN_CITIES.filter(c => c.toLowerCase().includes(v)).slice(0, 10);
+    render(items);
   });
 
+  input.addEventListener('keydown', e => {
+    const options = Array.from(dropdown.children);
+    if (!options.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      index = Math.min(index + 1, options.length - 1);
+      options.forEach((o, i) => o.classList.toggle('selected', i === index));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      index = Math.max(index - 1, 0);
+      options.forEach((o, i) => o.classList.toggle('selected', i === index));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (index >= 0) {
+        input.value = items[index];
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        close();
+      }
+    } else if (e.key === 'Escape') {
+      close();
+    }
+  });
+
+  input.addEventListener('blur', () => setTimeout(close, 150));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Минимум логики — без переключателя темы: уважаем системную.
   // Маска телефона
   const phone = $('#phone');
   if (phone) {
     phone.addEventListener('input', (e) => {
       const pos = e.target.selectionStart;
-      const prevLen = e.target.value.length;
+      const prev = e.target.value.length;
       e.target.value = phoneMask(e.target.value);
-      // попытка приблизительно сохранить курсор
-      const diff = e.target.value.length - prevLen;
+      const diff = e.target.value.length - prev;
       e.target.selectionEnd = Math.max(0, (pos || 0) + diff);
     });
   }
 
-  // Дата min = сегодня
+  // Дата: не раньше сегодня
   const dep = $('#departureDate');
   if (dep) dep.min = todayIso();
 
@@ -354,66 +298,55 @@ document.addEventListener('DOMContentLoaded', () => {
   initAutocomplete('fromAddress');
   initAutocomplete('toAddress');
 
-  // Слушатели выбора роли
+  // Выбор роли
   $$('#shipper, #carrier').forEach(r => {
     r.addEventListener('change', (e) => {
       state.data.applicantType = e.target.value;
       applyTypeVisibility(e.target.value);
       clearErrors();
-      // Подсветим только ошибку по роли если пусто
       setFieldError('applicantType', state.data.applicantType ? null : 'Выберите тип заявки');
     });
   });
 
-  // Ввод в полях — живая валидация после первого blur
+  // Живая валидация после blur
   $$('#cargoForm input, #cargoForm select, #cargoForm textarea').forEach(el => {
     el.addEventListener('blur', () => {
       state.touched[el.id] = true;
-      const rules = getRules(state.data.applicantType);
-      if (rules[el.id]) {
-        const err = rules[el.id](el.value);
-        setFieldError(el.id, err);
-      }
+      const r = rules(state.data.applicantType);
+      if (r[el.id]) setFieldError(el.id, r[el.id](el.value));
     });
     el.addEventListener('input', () => {
-      if (state.touched[el.id]) {
-        const rules = getRules(state.data.applicantType);
-        if (rules[el.id]) {
-          const err = rules[el.id](el.value);
-          setFieldError(el.id, err);
-        }
-      }
+      if (!state.touched[el.id]) return;
+      const r = rules(state.data.applicantType);
+      if (r[el.id]) setFieldError(el.id, r[el.id](el.value));
     });
   });
 
-  // Отправка
+  // Отправка формы
   $('#cargoForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (state.isSubmitting) return;
 
     collectForm();
-    const ok = validateAll();
-    if (!ok) return;
+    if (!validateAll()) return;
 
     state.isSubmitting = true;
     const btn = $('#submitButton');
-    btn.classList.add('loading');
     btn.disabled = true;
 
-    // Имитируем запрос
-    await new Promise(r => setTimeout(r, 1200));
+    // Имитация запроса (замените на fetch)
+    await new Promise(r => setTimeout(r, 900));
     console.log('Submitted form data:', state.data);
 
     // Успех
-    setHidden($('#applicationForm'), true);
-    setHidden($('#successMessage'), false);
+    $('#applicationForm').hidden = true;
+    $('#successMessage').hidden = false;
 
     state.isSubmitting = false;
-    btn.classList.remove('loading');
     btn.disabled = false;
   });
 
-  // Очистить
+  // Очистка
   $('#clearButton').addEventListener('click', resetForm);
 
   // Новая заявка
