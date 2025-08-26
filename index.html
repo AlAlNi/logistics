@@ -1,316 +1,219 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Доставка ваших вещей</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>Доставка ваших вещей</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div id="app" class="app-container">
-        <!-- Темный градиентный фон -->
-        <div class="bg-gradient-main"></div>
-        
-        <!-- Дополнительный слой с сеткой -->
-        <div class="bg-gradient-overlay"></div>
-        
-        <!-- Декоративные blur элементы -->
-        <div class="blur-element blur-1"></div>
-        <div class="blur-element blur-2"></div>
-        <div class="blur-element blur-3"></div>
-        <div class="blur-element blur-4"></div>
-        <div class="blur-element blur-5"></div>
-        <div class="blur-element blur-6"></div>
-        
-        <!-- Контент -->
-        <div class="content-wrapper">
-            <div class="container">
-                <header class="header">
-                    <h1 class="title">Доставка ваших вещей</h1>
-                    <p class="subtitle">
-                        Быстро найдите транспорт для переезда, доставки мебели или личных вещей
-                    </p>
-                    <div class="services-list">
-                        <span class="service-item">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                <polyline points="9,22 9,12 15,12 15,22"/>
-                            </svg>
-                            Переезд
-                        </span>
-                        <span class="service-item">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16.5 9.4l-7-7a2 2 0 0 0-3 0l-7 7a2 2 0 0 0 0 3l7 7a2 2 0 0 0 3 0l7-7a2 2 0 0 0 0-3z"/>
-                                <polyline points="10,9 9,9 8,9"/>
-                            </svg>
-                            Доставка покупок
-                        </span>
-                        <span class="service-item">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 9V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4"/>
-                                <path d="M2 11h20v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/>
-                                <path d="M6 11V9"/>
-                                <path d="M10 11V9"/>
-                                <path d="M14 11V9"/>
-                                <path d="M18 11V9"/>
-                            </svg>
-                            Мебель
-                        </span>
-                        <span class="service-item">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,12 20,19 4,19 4,12"/>
-                                <rect x="2" y="5" width="20" height="14" rx="2"/>
-                                <path d="M12 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                            </svg>
-                            Посылки
-                        </span>
-                    </div>
-                </header>
+  <a class="skip-link" href="#cargoForm">Перейти к форме</a>
 
-                <!-- Форма заявки -->
-                <div id="form-container" class="form-container">
-                    <!-- Экран успешной отправки -->
-                    <div id="success-screen" class="success-screen" style="display: none;">
-                        <div class="success-content">
-                            <div class="success-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M16.5 9.4l-7-7a2 2 0 0 0-3 0l-7 7a2 2 0 0 0 0 3l7 7a2 2 0 0 0 3 0l7-7a2 2 0 0 0 0-3z"/>
-                                    <polyline points="10,9 9,9 8,9"/>
-                                </svg>
-                            </div>
-                            <h2>Заявка отправлена!</h2>
-                            <p>Мы получили вашу заявку и скоро свяжемся с вами для уточнения деталей.</p>
-                            <button id="reset-btn" class="btn btn-primary btn-full">Создать новую заявку</button>
-                        </div>
-                    </div>
-
-                    <!-- Основная форма -->
-                    <div id="main-form" class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Оставьте заявку</h2>
-                            <p class="card-subtitle">Заполните форму — это займет всего минуту</p>
-                        </div>
-                        <div class="card-content">
-                            <form id="cargo-form">
-                                <!-- Выбор типа заявки -->
-                                <div class="form-group">
-                                    <label class="form-label">Что вам нужно? *</label>
-                                    <div class="radio-group">
-                                        <div class="radio-option" data-value="shipper">
-                                            <input type="radio" id="shipper" name="applicantType" value="shipper">
-                                            <label for="shipper" class="radio-label">
-                                                <div class="radio-content">
-                                                    <div class="radio-icon">
-                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                                            <polyline points="9,22 9,12 15,12 15,22"/>
-                                                        </svg>
-                                                    </div>
-                                                    <div class="radio-text">
-                                                        <div class="radio-title">Доставить вещи</div>
-                                                        <div class="radio-description">Переезд, мебель, покупки</div>
-                                                    </div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                        <div class="radio-option" data-value="carrier">
-                                            <input type="radio" id="carrier" name="applicantType" value="carrier">
-                                            <label for="carrier" class="radio-label">
-                                                <div class="radio-content">
-                                                    <div class="radio-icon">
-                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M14 18V6a2 2 0 0 0-2-2l-1 2h-3l-1-2a2 2 0 0 0-2 2v12"/>
-                                                            <path d="M7 14h.01"/>
-                                                            <path d="M17 14h.01"/>
-                                                            <path d="M7 18h.01"/>
-                                                            <path d="M17 18h.01"/>
-                                                        </svg>
-                                                    </div>
-                                                    <div class="radio-text">
-                                                        <div class="radio-title">Предложить транспорт</div>
-                                                        <div class="radio-description">У меня есть машина</div>
-                                                    </div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="error-message" id="applicantType-error"></div>
-                                </div>
-
-                                <!-- Остальные поля формы появляются динамически -->
-                                <div id="form-fields" style="display: none;">
-                                    <!-- Контактная информация -->
-                                    <div class="form-section">
-                                        <h3 class="section-title">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                                <circle cx="12" cy="7" r="4"/>
-                                            </svg>
-                                            Как с вами связаться?
-                                        </h3>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <label for="fullName" class="form-label">Ваше имя *</label>
-                                                <input type="text" id="fullName" name="fullName" class="form-input" placeholder="Иван Петров">
-                                                <div class="error-message" id="fullName-error"></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="phone" class="form-label">Телефон *</label>
-                                                <input type="tel" id="phone" name="phone" class="form-input" placeholder="+7 (999) 123-45-67">
-                                                <div class="error-message" id="phone-error"></div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="email" class="form-label">Email (необязательно)</label>
-                                            <input type="email" id="email" name="email" class="form-input" placeholder="ivan@mail.ru">
-                                            <div class="error-message" id="email-error"></div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Поля для отправителей -->
-                                    <div id="shipper-fields" class="form-section" style="display: none;">
-                                        <h3 class="section-title">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M16.5 9.4l-7-7a2 2 0 0 0-3 0l-7 7a2 2 0 0 0 0 3l7 7a2 2 0 0 0 3 0l7-7a2 2 0 0 0 0-3z"/>
-                                                <polyline points="10,9 9,9 8,9"/>
-                                            </svg>
-                                            Что нужно перевезти?
-                                        </h3>
-                                        <div class="form-row form-row-3">
-                                            <div class="form-group">
-                                                <label for="cargoType" class="form-label">Что везём *</label>
-                                                <select id="cargoType" name="cargoType" class="form-select">
-                                                    <option value="">Выберите</option>
-                                                    <option value="furniture">Мебель</option>
-                                                    <option value="household">Вещи при переезде</option>
-                                                    <option value="appliances">Бытовая техника</option>
-                                                    <option value="purchases">Покупки из магазина</option>
-                                                    <option value="packages">Посылки/документы</option>
-                                                    <option value="other">Другое</option>
-                                                </select>
-                                                <div class="error-message" id="cargoType-error"></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="cargoWeight" class="form-label">Примерный вес *</label>
-                                                <select id="cargoWeight" name="cargoWeight" class="form-select">
-                                                    <option value="">Вес</option>
-                                                    <option value="5">До 5 кг</option>
-                                                    <option value="20">5-20 кг</option>
-                                                    <option value="50">20-50 кг</option>
-                                                    <option value="100">50-100 кг</option>
-                                                    <option value="300">100-300 кг</option>
-                                                    <option value="500">300-500 кг</option>
-                                                    <option value="1000">Больше 500 кг</option>
-                                                </select>
-                                                <div class="error-message" id="cargoWeight-error"></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="departureDate" class="form-label">Когда везти? *</label>
-                                                <input type="date" id="departureDate" name="departureDate" class="form-input">
-                                                <div class="error-message" id="departureDate-error"></div>
-                                            </div>
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <label for="fromAddress" class="form-label">Откуда забрать *</label>
-                                                <div class="autocomplete-container">
-                                                    <input type="text" id="fromAddress" name="fromAddress" class="form-input" placeholder="г. Москва">
-                                                    <div class="autocomplete-dropdown" id="fromAddress-dropdown"></div>
-                                                </div>
-                                                <div class="error-message" id="fromAddress-error"></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="toAddress" class="form-label">Куда доставить *</label>
-                                                <div class="autocomplete-container">
-                                                    <input type="text" id="toAddress" name="toAddress" class="form-input" placeholder="г. Санкт-Петербург">
-                                                    <div class="autocomplete-dropdown" id="toAddress-dropdown"></div>
-                                                </div>
-                                                <div class="error-message" id="toAddress-error"></div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="cargoDescription" class="form-label">Дополнительные детали</label>
-                                            <textarea id="cargoDescription" name="cargoDescription" class="form-textarea" rows="2" placeholder="Размеры, хрупкость, этаж, нужны ли грузчики..."></textarea>
-                                        </div>
-                                    </div>
-
-                                    <!-- Поля для перевозчиков -->
-                                    <div id="carrier-fields" class="form-section" style="display: none;">
-                                        <h3 class="section-title">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M14 18V6a2 2 0 0 0-2-2l-1 2h-3l-1-2a2 2 0 0 0-2 2v12"/>
-                                                <path d="M7 14h.01"/>
-                                                <path d="M17 14h.01"/>
-                                                <path d="M7 18h.01"/>
-                                                <path d="M17 18h.01"/>
-                                            </svg>
-                                            Ваш транспорт
-                                        </h3>
-                                        <div class="form-row form-row-3">
-                                            <div class="form-group">
-                                                <label for="vehicleType" class="form-label">Тип машины *</label>
-                                                <select id="vehicleType" name="vehicleType" class="form-select">
-                                                    <option value="">Выберите</option>
-                                                    <option value="car">Легковая</option>
-                                                    <option value="hatchback">Универсал/хэтчбек</option>
-                                                    <option value="pickup">Пикап</option>
-                                                    <option value="van">Газель/фургон</option>
-                                                    <option value="truck">Грузовик</option>
-                                                </select>
-                                                <div class="error-message" id="vehicleType-error"></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="maxWeight" class="form-label">Сколько увезу *</label>
-                                                <select id="maxWeight" name="maxWeight" class="form-select">
-                                                    <option value="">Вес</option>
-                                                    <option value="50">До 50 кг</option>
-                                                    <option value="200">До 200 кг</option>
-                                                    <option value="500">До 500 кг</option>
-                                                    <option value="1000">До 1 тонны</option>
-                                                    <option value="3000">До 3 тонн</option>
-                                                    <option value="5000">Больше 3 тонн</option>
-                                                </select>
-                                                <div class="error-message" id="maxWeight-error"></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="pricePerKm" class="form-label">Цена за км</label>
-                                                <input type="number" id="pricePerKm" name="pricePerKm" class="form-input" min="0" placeholder="30">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="availableRoutes" class="form-label">Куда ездите? *</label>
-                                            <textarea id="availableRoutes" name="availableRoutes" class="form-textarea" rows="2" placeholder="По Москве и области, Москва-Питер, по всей России..."></textarea>
-                                            <div class="error-message" id="availableRoutes-error"></div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Предупреждение об ошибках -->
-                                    <div id="form-alert" class="alert alert-error" style="display: none;">
-                                        <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <line x1="12" y1="8" x2="12" y2="12"/>
-                                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                                        </svg>
-                                        Пожалуйста, заполните все обязательные поля.
-                                    </div>
-
-                                    <!-- Кнопки управления -->
-                                    <div class="form-actions">
-                                        <button type="button" id="clear-btn" class="btn btn-outline">Очистить</button>
-                                        <button type="submit" id="submit-btn" class="btn btn-primary">
-                                            <span class="btn-text">Найти транспорт</span>
-                                            <span class="btn-loading" style="display: none;">Отправляем...</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <header class="app-bar">
+    <div class="container">
+      <h1 class="app-title">Доставка ваших вещей</h1>
+      <p class="app-subtitle">
+        Найдём транспорт быстро и без лишних звонков.
+      </p>
     </div>
+  </header>
 
-    <script src="script.js"></script>
+  <main class="container">
+    <!-- Карточка формы -->
+    <section class="card" id="applicationForm">
+      <form id="cargoForm" novalidate>
+        <!-- Тип заявки -->
+        <fieldset class="group">
+          <legend class="label">Что вам нужно? <span class="req">*</span></legend>
+          <div class="seg">
+            <input type="radio" name="applicantType" id="shipper" value="shipper" />
+            <label for="shipper" class="seg-item">
+              <span class="seg-ic">🏠</span>
+              <span class="seg-txt">Доставить вещи</span>
+            </label>
+
+            <input type="radio" name="applicantType" id="carrier" value="carrier" />
+            <label for="carrier" class="seg-item">
+              <span class="seg-ic">🚚</span>
+              <span class="seg-txt">Предложить транспорт</span>
+            </label>
+          </div>
+          <div class="error" id="applicantType-error" aria-live="polite"></div>
+        </fieldset>
+
+        <!-- Контакты -->
+        <section class="section" id="contactSection" hidden>
+          <h2 class="section-title">Контакты</h2>
+
+          <div class="grid two">
+            <div class="field">
+              <label for="fullName" class="label">Ваше имя <span class="req">*</span></label>
+              <input class="input" type="text" id="fullName" name="fullName" placeholder="Иван Петров" autocomplete="name" inputmode="text" />
+              <div class="error" id="fullName-error" aria-live="polite"></div>
+            </div>
+
+            <div class="field">
+              <label for="phone" class="label">Телефон <span class="req">*</span></label>
+              <input class="input" type="tel" id="phone" name="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" inputmode="tel" maxlength="18" />
+              <div class="hint">Без спама. Только по делу.</div>
+              <div class="error" id="phone-error" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="email" class="label">Email (необязательно)</label>
+            <input class="input" type="email" id="email" name="email" placeholder="ivan@mail.ru" autocomplete="email" />
+            <div class="error" id="email-error" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Для отправителей -->
+        <section class="section" id="shipperSection" hidden>
+          <h2 class="section-title">Что и куда везём</h2>
+
+          <div class="grid three">
+            <div class="field">
+              <label for="cargoType" class="label">Тип груза <span class="req">*</span></label>
+              <select class="input select" id="cargoType" name="cargoType">
+                <option value="">Выберите</option>
+                <option value="furniture">🛋️ Мебель</option>
+                <option value="household">📦 Вещи при переезде</option>
+                <option value="appliances">🔌 Бытовая техника</option>
+                <option value="purchases">🛒 Покупки из магазина</option>
+                <option value="packages">📮 Посылки/документы</option>
+                <option value="other">❓ Другое</option>
+              </select>
+              <div class="error" id="cargoType-error" aria-live="polite"></div>
+            </div>
+
+            <div class="field">
+              <label for="cargoWeight" class="label">Вес <span class="req">*</span></label>
+              <select class="input select" id="cargoWeight" name="cargoWeight">
+                <option value="">Выберите</option>
+                <option value="5">До 5 кг</option>
+                <option value="20">5–20 кг</option>
+                <option value="50">20–50 кг</option>
+                <option value="100">50–100 кг</option>
+                <option value="300">100–300 кг</option>
+                <option value="500">300–500 кг</option>
+                <option value="1000">Более 500 кг</option>
+              </select>
+              <div class="error" id="cargoWeight-error" aria-live="polite"></div>
+            </div>
+
+            <div class="field">
+              <label for="departureDate" class="label">Когда? <span class="req">*</span></label>
+              <input class="input" type="date" id="departureDate" name="departureDate" />
+              <div class="error" id="departureDate-error" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <div class="grid two">
+            <div class="field">
+              <label for="fromAddress" class="label">Откуда забрать <span class="req">*</span></label>
+              <div class="ac-wrap">
+                <input class="input" id="fromAddress" name="fromAddress" placeholder="г. Москва" autocomplete="off" />
+                <div class="ac-dd" id="fromAddress-dropdown" role="listbox"></div>
+              </div>
+              <div class="error" id="fromAddress-error" aria-live="polite"></div>
+            </div>
+
+            <div class="field">
+              <label for="toAddress" class="label">Куда доставить <span class="req">*</span></label>
+              <div class="ac-wrap">
+                <input class="input" id="toAddress" name="toAddress" placeholder="г. Санкт-Петербург" autocomplete="off" />
+                <div class="ac-dd" id="toAddress-dropdown" role="listbox"></div>
+              </div>
+              <div class="error" id="toAddress-error" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cargoDescription" class="label">Дополнительные детали</label>
+            <textarea class="input textarea" id="cargoDescription" name="cargoDescription" rows="2" placeholder="Размеры, хрупкость, этаж, нужны ли грузчики..."></textarea>
+          </div>
+        </section>
+
+        <!-- Для перевозчиков -->
+        <section class="section" id="carrierSection" hidden>
+          <h2 class="section-title">Ваш транспорт</h2>
+
+          <div class="grid three">
+            <div class="field">
+              <label for="vehicleType" class="label">Тип машины <span class="req">*</span></label>
+              <select class="input select" id="vehicleType" name="vehicleType">
+                <option value="">Выберите</option>
+                <option value="car">🚗 Легковая</option>
+                <option value="hatchback">🚙 Универсал/хэтчбек</option>
+                <option value="pickup">🛻 Пикап</option>
+                <option value="van">🚐 Фургон/Газель</option>
+                <option value="truck">🚚 Грузовик</option>
+              </select>
+              <div class="error" id="vehicleType-error" aria-live="polite"></div>
+            </div>
+
+            <div class="field">
+              <label for="maxWeight" class="label">Грузоподъёмность <span class="req">*</span></label>
+              <select class="input select" id="maxWeight" name="maxWeight">
+                <option value="">Выберите</option>
+                <option value="50">До 50 кг</option>
+                <option value="200">До 200 кг</option>
+                <option value="500">До 500 кг</option>
+                <option value="1000">До 1 тонны</option>
+                <option value="3000">До 3 тонн</option>
+                <option value="5000">Больше 3 тонн</option>
+              </select>
+              <div class="error" id="maxWeight-error" aria-live="polite"></div>
+            </div>
+
+            <div class="field">
+              <label for="pricePerKm" class="label">Цена за км</label>
+              <input class="input" type="number" id="pricePerKm" name="pricePerKm" min="0" placeholder="30" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="availableRoutes" class="label">Куда ездите? <span class="req">*</span></label>
+            <textarea class="input textarea" id="availableRoutes" name="availableRoutes" rows="2" placeholder="По Москве и области, Москва—Питер, по всей России..."></textarea>
+            <div class="error" id="availableRoutes-error" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Ошибки -->
+        <div class="alert error" id="errorAlert" hidden>
+          <span class="alert-ic" aria-hidden="true">⚠️</span>
+          <span>Пожалуйста, заполните обязательные поля.</span>
+        </div>
+
+        <!-- Действия -->
+        <div class="actions" id="formActions" hidden>
+          <button type="button" class="btn ghost" id="clearButton">Очистить</button>
+          <button type="submit" class="btn primary" id="submitButton">
+            <span id="submitText">Найти транспорт</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Успех -->
+    <section class="card" id="successMessage" hidden>
+      <div class="success">
+        <div class="success-ic">📦</div>
+        <h2>Заявка отправлена!</h2>
+        <p class="muted">Мы получили вашу заявку и скоро свяжемся.</p>
+        <button type="button" class="btn primary wide" id="newApplicationButton">Создать новую заявку</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Отступ под безопасную зону в Telegram/iOS -->
+  <footer class="safe-bottom"></footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
